@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    label {
+        display: inline-block;
+        min-width: 100px;
+    }
+</style>
+
+<body>
+    <form action="">
+        <label for="username">username</label>
+        <input type="text" placeholder="mời nhập tên" id="username"> <br>
+        <label for="email">email</label>
+        <input type="text" id="email"> <br>
+        <label for="phone">phone</label>
+        <input type="text" id="phone"> <br>
+        <label for="address">address</label>
+        <input type="text" id="address"> <br>
+        <label for="">ID</label>
+        <input disabled type="text" id="idUser"> <br>
+        <button onclick="addStudent(event)"> add </button>
+        <input oninput="searchUser()" type="text" placeholder="tìm kiếm theo tên " id="search">
+        <button onclick="sortUser(event)">sort</button>
+    </form>
+    <!-- table để đổ dữ liệu ra! -->
+    <table border="1">
+        <thead>
+            <tr>
+                <th>STT</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Address</th>
+                <th>ID</th>
+                <th colspan="2">Action</th>
+            </tr>
+
+        </thead>
+        <tbody id="body">
+            <!--  <tr>
+                <td>1</td>
+                <td>a hảo</td>
+                <td> haohao@gmail.com</td>
+                <td>113</td>
+                <td>trảng bom</td>
+                <td>sửa</td>
+                <td>xoá</td>
+            </tr> -->
+        </tbody>
+
+    </table>
+    <script>
+        /* 
+            các bước làm
+            B1: tạo được 1 cái form để nhập dữ liệu
+            B2: khởi tạo 1 cái mảng để chứa danh sách sinh viên
+            B3: lấy thông tin người dùng nhập vào 
+            B4: khởi tạo đối tượng chứa các thuộc tính của đối tượng+  tạo id cho nó
+            B5: push vào mảng khởi tạo
+            B6: đem cái mảng đó đi render.
+         */
+        // function tạo id riêng cho các đối tượng
+        function uuid() {
+            return Math.floor(Math.random() * 9999999999999 + new Date().getMilliseconds());// 0<= x <1
+        }
+        let students = JSON.parse(localStorage.getItem("users"))||[];
+        // lấy dữ liệu ở trên local về
+     
+        //note: khi làm việc với form phải ngăn chặn việc submit của form
+        // function thêm sinh viên
+        function addStudent(e) {
+            e.preventDefault();
+            let username = document.getElementById("username").value;
+            let email = document.getElementById("email").value;
+            let phone = document.getElementById("phone").value;
+            let address = document.getElementById("address").value;
+            let idUser = document.getElementById("idUser").value;
+            // console.log("username", username);
+            //khởi tạo đối tượng
+            let infor = {
+                name: username,
+                email: email,
+                phone: phone,
+                address: address,
+                id: uuid(),
+            }
+            for (let i = 0; i < students.length; i++) {
+                if(idUser==students[i].id){
+                    students.splice(i,1,{...infor,id:idUser});
+                    // đoạn này đã xoá xong
+                    // phải lưu lại trên local
+                    localStorage.setItem("users",JSON.stringify(students));
+                    renderStudents(students);
+                     document.getElementById("username").value = "";
+                    document.getElementById("email").value = "";
+                    document.getElementById("phone").value = "";
+                    document.getElementById("address").value = "";
+                    document.getElementById("idUser").value = "";
+                    return;
+                }
+            }
+            students.push(infor);
+            // sau khi push vào rồi phải lưu lại
+            localStorage.setItem("users",JSON.stringify(students));
+            renderStudents(students)
+            // đem cái mảng đó đi render
+            document.getElementById("username").value = "";
+            document.getElementById("email").value = "";
+            document.getElementById("phone").value = "";
+            document.getElementById("address").value = "";
+        }
+        // function hiển thị sinh viên
+        function renderStudents(arr) {
+            let text = "";
+            for (let i = 0; i < arr.length; i++) {
+                text +=
+                    `
+                <tr>
+                    <td>${i + 1}</td>
+                    <td>${arr[i].name}</td>
+                    <td>${arr[i].email}</td>
+                    <td>${arr[i].phone}</td>
+                    <td>${arr[i].address}</td>
+                    <td>${arr[i].id}</td>
+                    <td onclick=editUser(${arr[i].id})>sửa</td>
+                    <td onclick=deleteUser(${arr[i].id})>xoá</td>
+                </tr>
+               `
+            }
+            document.getElementById("body").innerHTML = text;
+        }
+        renderStudents(students)
+        // function xoá user
+        function deleteUser(id1) {
+
+            for (let i = 0; i < students.length; i++) {
+                if (students[i].id == id1) {
+                    // phải thêm confirm bạn muốn xoá hay không?
+                    let confirm1 = confirm("bạn có muốn xoá hay không?")
+                    if (confirm1) {
+                        students.splice(i, 1);
+                        localStorage.setItem("users", JSON.stringify(students));
+                        renderStudents(students);
+                    }
+                    return;
+                }
+
+            }
+
+        }
+        // function sửa user idUser
+        function editUser(id) {
+
+            for (let i = 0; i < students.length; i++) {
+                if (students[i].id == id) {
+                    document.getElementById("username").value = students[i].name;
+                    document.getElementById("email").value = students[i].email;
+                    document.getElementById("phone").value = students[i].phone;
+                    document.getElementById("address").value = students[i].address;
+                    document.getElementById("idUser").value = students[i].id;
+                    
+                }
+
+            }
+        }
+        // function tìm kiếm
+        function searchUser() {
+            let nameSearch=document.getElementById("search").value;
+            let result=[];
+            for (let i = 0; i < students.length; i++) {
+                if(students[i].name.indexOf(nameSearch) != -1){
+                    result.push(students[i])
+                }
+            }
+            renderStudents(result);
+        }
+        // function sort
+        function sortUser(e) {
+            e.preventDefault();
+
+            let result=students.sort((a,b)=>{
+                if(a.name>b.name){
+                    return -1
+                }else if(a.name<b.name){
+                    return 1
+                }else{
+                    return 0
+                }
+            })
+            renderStudents(result)
+        }
+
+        
+
+    </script>
+</body>
+
+</html>

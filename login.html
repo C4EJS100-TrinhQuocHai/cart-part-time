@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+    <style>
+         label{
+        display: inline-block;
+        min-width: 120px;
+    }
+    </style>
+<body>
+    <h1> login </h1>
+    <form action="">
+
+        <label for=""> email</label>
+        <input type="text" id="email"> <br>
+        <label for=""> password</label>
+        <input type="text" id="password"> <br>
+        <button onclick="login(event)">login</button>
+    </form>
+    <script>
+
+        let users=JSON.parse(localStorage.getItem("users"))||[];
+        function login(e) {
+            e.preventDefault()
+            let email=document.getElementById("email").value;
+            let password=document.getElementById("password").value;
+            for (let i = 0; i < users.length; i++) {
+                if(users[i].email==email&& users[i].password==password){
+                    // chuyển sang trang chính
+                    // khi login thành công cắm cờ trên local
+                    localStorage.setItem("checkLogin",users[i].id)
+                    window.location.href="./index.html";
+                    return;
+                }
+            }
+            console.log("tài khoản không tồn tại!");
+        }
+    </script>
+</body>
+</html>

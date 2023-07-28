@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    label{
+        display: inline-block;
+        min-width: 120px;
+    }
+</style>
+<body>
+    <h1> register</h1>
+    <form action="">
+        <label for="">username</label>
+        <input  type="text" id="username"> <br>
+        <label for=""> email</label>
+        <input  type="text" id="email"> <br>
+        <label for=""> password</label>
+        <input type="text" id="password"> <br>
+        <label for=""> confirmPassword</label>
+        <input type="text" id="confirmPassword"> <br>
+        <button onclick="register(event)">register</button>
+    </form>
+    <script>
+        /*
+            logic register 
+            -lấy giá trị người dùng nhập vào 
+
+         */
+        // sinh id cho từng user
+        function uuid() {
+            return Math.floor(Math.random()*9598845465454)
+        }
+        // lấy mảng chứa thông tin trên local về
+        let users=JSON.parse(localStorage.getItem("users"))||[];
+        function register(e) {
+                e.preventDefault()
+            let username=document.getElementById("username").value;
+            let email = document.getElementById("email").value;
+            let password = document.getElementById("password").value;
+            let confirmPassword = document.getElementById("confirmPassword").value;
+
+            if(password!=confirmPassword){
+                console.log("mật khẩu không khớp!");
+                return;
+            }
+            let obj={
+                name:username,
+                email:email,
+                password:password,
+                id:uuid(),
+                cart:[],
+            }
+            for (let i = 0; i < users.length; i++) {
+               if(users[i].email===email){
+                    console.log("email đã tồn tại");
+                    return
+               }
+            }
+             users.push(obj);
+             localStorage.setItem("users", JSON.stringify(users));
+            // sau khi push xong thì lưu lại
+            //chuyển sang trang login
+            window.location.href="./login.html";
+        }
+       
+    </script>
+</body>
+</html>
